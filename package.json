@@ -1,0 +1,24 @@
+{
+  "name": "govee-server",
+  "version": "1.0.0",
+  "description": "The server to serve as the middleman between Govee API requests and the frontend for controlling the lights in the house.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/7MinutesDead-Git/govee-server.git"
+  },
+  "author": "Alex Gulikers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/7MinutesDead-Git/govee-server/issues"
+  },
+  "homepage": "https://github.com/7MinutesDead-Git/govee-server#readme",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1"
+  }
+}
