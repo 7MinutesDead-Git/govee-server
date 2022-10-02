@@ -50,3 +50,14 @@ export interface goveeDevice {
         }
     }
 }
+
+export interface goveeDeviceState {
+    device: string,
+    model: string,
+    properties: [
+        { online: boolean },
+        { powerState: string },
+        { brightness: number },
+        { color: { r: number, g: number, b: number } }
+    ]
+}

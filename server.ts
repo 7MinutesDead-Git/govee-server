@@ -2,7 +2,13 @@ import * as dotenv from 'dotenv'
 import express from 'express'
 import axios from 'axios'
 
-import {govee, goveeCommandRequest, goveeCommandResponse, goveeDevice, goveeDevicesResponse} from './interfaces.js'
+import {
+    govee,
+    goveeCommandRequest,
+    goveeDevice,
+    goveeDevicesResponse,
+    goveeDeviceState
+} from './interfaces.js'
 
 dotenv.config()
 const app = express()
@@ -41,8 +47,31 @@ app.get('/devices', async (req, res) => {
             console.error(response.data)
             res.send(response.data)
         }
+        console.log(response.data.data.devices)
         const onlineDevices: goveeDevice[] = response.data.data.devices
         res.send(onlineDevices)
+    }
+    catch (error) {
+        console.error(error)
+    }
+})
+
+app.get('/devices/state', async (req, res) => {
+    // "state?device=etc&model=etc"
+    // Request Query Parameters:
+    // device: 06:7A:A4:C1:38:5A:2A:8D
+    // model: H6148
+    const url = `${govee.url}${govee.devices}state?device=${req.query.device}&model=${req.query.model}`
+    try {
+        const response = await axios.get(url, {
+            headers: {'Govee-API-Key': process.env.GOVEE_KEY},
+            params: {
+                device: req.body.device,
+                model: req.body.model
+            }
+        })
+        const deviceState: goveeDeviceState = response.data
+        res.send(deviceState)
     }
     catch (error) {
         console.error(error)
