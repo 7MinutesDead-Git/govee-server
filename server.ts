@@ -83,7 +83,7 @@ app.put('/devices', async (req, res) => {
     try {
         const response = await sendLightCommand(url, req.body)
         if (response.status === 429) {
-            res.send(response.data)
+            res.status(429).send(response)
         }
         else {
             console.log("Command sent successfully!", response.data)
@@ -92,11 +92,11 @@ app.put('/devices', async (req, res) => {
     }
     catch (error) {
         console.error(error.response.data)
-        res.send(error.response.data)
+        res.status(429).send(error.response.data)
     }
 })
 
 
-app.listen(3001, () => {
-    console.log('Server listening on port 3001')
+app.listen(process.env.PORT, () => {
+    console.log('Server listening on port', process.env.PORT)
 })
