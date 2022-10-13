@@ -101,6 +101,6 @@ app.put('/devices', async (req, res) => {
 })
 
 
-app.listen(process.env.PORT, () => {
-    console.log('Govee server listening on port ', process.env.PORT)
+app.listen(process.env.GOVEE_PORT, () => {
+    console.log('Govee server listening on port ', process.env.GOVEE_PORT)
 })
