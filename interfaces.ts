@@ -31,7 +31,8 @@ export interface goveeDevicesResponse {
     message: string,
     data: {
         devices: goveeDevice[]
-    }
+    },
+    rateLimitReset?: string
 }
 
 export interface goveeDevice {

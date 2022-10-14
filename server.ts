@@ -25,10 +25,34 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 
-async function getConnectedLights(url: string) {
-    return await axios.get<goveeDevicesResponse>(url, {
-        headers: {'Govee-API-Key': process.env.GOVEE_KEY}
-    })
+async function getConnectedLights(url: string): Promise<goveeDevicesResponse> {
+    try {
+        const response = await axios.get<goveeDevicesResponse>(url, {
+            headers: {'Govee-API-Key': process.env.GOVEE_KEY}
+        })
+        return response.data
+    }
+    catch (error) {
+        const responseObject: goveeDevicesResponse = {
+            code: 500,
+            message: error.message,
+            data: {
+                devices: []
+            }
+        }
+        console.log("---------------------------")
+        console.log(error.response.headers['x-ratelimit-reset'])
+        console.log(error.response.headers)
+        if (error.code === "ERR_BAD_REQUEST") {
+            responseObject.code = 429
+            responseObject.message = error.response.headers["x-ratelimit-reset"]
+            return responseObject
+        }
+        else {
+            console.log(error)
+            return responseObject
+        }
+    }
 }
 
 async function sendLightCommand(url: string, command: goveeCommandRequest) {
@@ -44,13 +68,19 @@ app.get('/devices', async (req, res) => {
     const url = `${govee.url}${govee.devices}`
     try {
         const response = await getConnectedLights(url)
-        if (response.status === 429) {
-            console.error(response.data)
-            res.send(response.data)
+        if (response.code === 429) {
+            res.status(response.code)
+            const date = new Date(Number(response.message) * 1000)
+            console.log("Retry at: ", date.toLocaleString())
+            response.rateLimitReset = date.toLocaleString()
+            // Set the retry time in the response header.
+            res.set('Retry-After', response.message)
+            res.send(response)
         }
-        console.log(response.data.data.devices)
-        const onlineDevices: goveeDevice[] = response.data.data.devices
-        res.send(onlineDevices)
+        else {
+            const onlineDevices: goveeDevice[] = response.data.devices
+            res.send(onlineDevices)
+        }
     }
     catch (error) {
         console.error(error)
