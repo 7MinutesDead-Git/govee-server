@@ -12,6 +12,7 @@ import {
 
 dotenv.config()
 const app = express()
+let rateLimitExpire = ""
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*')
@@ -70,11 +71,9 @@ app.get('/devices', async (req, res) => {
         const response = await getConnectedLights(url)
         if (response.code === 429) {
             res.status(response.code)
-            const date = new Date(Number(response.message) * 1000)
-            console.log("Retry at: ", date.toLocaleString())
-            response.rateLimitReset = date.toLocaleString()
-            // Set the retry time in the response header.
-            res.set('Retry-After', response.message)
+            rateLimitExpire = new Date(Number(response.message) * 1000).toLocaleString()
+            console.log("Retry at: ", rateLimitExpire)
+            response.rateLimitReset = rateLimitExpire
             res.send(response)
         }
         else {
@@ -85,6 +84,12 @@ app.get('/devices', async (req, res) => {
     catch (error) {
         console.error(error)
     }
+})
+
+app.get("/rate-limit", (req, res) => {
+    res.send({
+        date: rateLimitExpire
+    })
 })
 
 app.get('/devices/state', async (req, res) => {
