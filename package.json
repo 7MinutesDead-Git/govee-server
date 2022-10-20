@@ -20,10 +20,12 @@
   },
   "homepage": "https://github.com/7MinutesDead-Git/govee-server#readme",
   "dependencies": {
+    "@types/express-ws": "^3.0.1",
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
+    "express-ws": "^5.0.2",
     "nodemon": "^2.0.20"
   },
   "devDependencies": {
