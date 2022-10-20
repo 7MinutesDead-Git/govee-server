@@ -34,6 +34,9 @@ app.ws('/', (ws, req) => {
     console.log(req.socket.remoteAddress)
     ws.on('open', () => {
         console.log('Websocket opened.')
+        setInterval(() => {
+            ws.send('keepalive ping')
+        }, 10000)
     })
 
     ws.on('message', (msg) => {
