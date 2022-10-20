@@ -19,8 +19,8 @@ export const devicesController = {
             }
         }
         catch (error) {
-            console.error(error.response.data)
-            res.status(429).send(error.response.data)
+            console.error(error.response)
+            res.status(429).send(error.response)
         }
     },
     async getDevices(req, res) {
@@ -41,7 +41,10 @@ export const devicesController = {
             }
         }
         catch (error) {
-            console.error(error)
+            console.error(error.code)
+            if (error.code === "ETIMEDOUT") {
+                res.status(408).send(error)
+            }
         }
     },
     async getState(req, res) {
