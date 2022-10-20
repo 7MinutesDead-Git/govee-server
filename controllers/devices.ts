@@ -24,7 +24,7 @@ export const devicesController = {
         }
     },
     async getDevices(req, res) {
-        console.log(`Initial devices request received at ${req.url} from ${req.ip}.`, req.body)
+        console.log(`Initial devices request received: URL "${req.url}" from IP ${req.ip}`)
         const url = `${govee.url}${govee.devices}`
         try {
             const response = await getConnectedLights(url)
@@ -49,9 +49,7 @@ export const devicesController = {
         // Request Query Parameters:
         // device: 06:7A:A4:C1:38:5A:2A:8D
         // model: H6148
-        console.log(`Request received from ${req.ip} for device state.`)
         const url = `${govee.url}${govee.devices}state?device=${req.query.device}&model=${req.query.model}`
-        console.log(url)
         try {
             const response = await axios.get(url, {
                 headers: {'Govee-API-Key': process.env.GOVEE_KEY},
