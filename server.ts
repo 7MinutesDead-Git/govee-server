@@ -2,13 +2,13 @@ import * as dotenv from 'dotenv'
 import express from 'express'
 import expressWs from 'express-ws'
 import { devicesRoutes } from './routes/devices.js'
-import { generateUID } from './utils/helpers.js'
 
 // ----------------------------------------------------------------
 // Initialization
-const { app } = expressWs(express())
+const websocket = expressWs(express())
+const app = websocket.app
+const wss = websocket.getWss()
 dotenv.config()
-const wsClients = {}
 
 
 // ----------------------------------------------------------------
@@ -30,18 +30,20 @@ app.use("/devices", devicesRoutes)
 
 // ----------------------------------------------------------------
 // Websocket
-app.ws('/ws', (ws, req) => {
-    console.log(`Websocket connection established from ${req.ip}.`)
+app.ws('/', (ws, req) => {
+    console.log(req.socket.remoteAddress)
+    ws.on('open', () => {
+        console.log('Websocket opened.')
+    })
+
     ws.on('message', (msg) => {
-        console.log(msg)
+        const broadcastData = msg
+        // Send updates to all other clients.
+        for (const client of wss.clients) {
+            client.send(broadcastData)
+        }
     })
-    ws.on('request', (req) => {
-        console.log(req)
-        console.log(`${new Date().toLocaleString()}: new websocket request from ${req.origin}.`)
-        const userID = generateUID()
-        const connection = req.accept(null, req.origin)
-        wsClients[userID] = req
-    })
+
     ws.on('close', () => {
         console.log(`Websocket connection closed from ${req.ip}.`)
     })
