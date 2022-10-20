@@ -11,7 +11,7 @@ export const devicesController = {
         try {
             const response = await sendLightCommand(url, req.body)
             if (response.status === 429) {
-                res.status(429).send(response)
+                res.status(429).send(response.data)
             }
             else {
                 console.log("Command sent successfully!", response.data)
@@ -19,8 +19,8 @@ export const devicesController = {
             }
         }
         catch (error) {
-            console.error(error.response)
-            res.status(429).send(error.response)
+            console.error(error.response.data)
+            res.status(429).send(error)
         }
     },
     async getDevices(req, res) {
