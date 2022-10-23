@@ -31,7 +31,8 @@ app.use("/devices", devicesRoutes)
 // ----------------------------------------------------------------
 // Websocket
 app.ws('/', (ws, req) => {
-    console.log(req.socket.remoteAddress)
+    console.log("--------------------")
+    console.log("Websocket connections: ", wss.clients.size)
     ws.on('open', () => {
         console.log('Websocket opened.')
         setInterval(() => {
@@ -39,7 +40,12 @@ app.ws('/', (ws, req) => {
         }, 10000)
     })
 
-    ws.on('message', (msg) => {
+    ws.on('message', (msg: string) => {
+        if (msg === "ping") {
+            return
+        }
+        // const data = JSON.parse(msg)
+        // console.log(`${new Date().toLocaleString()}: Message received from client ${req.ip}: ${data.type}`)
         const broadcastData = msg
         // Send updates to all other clients.
         for (const client of wss.clients) {
@@ -47,8 +53,8 @@ app.ws('/', (ws, req) => {
         }
     })
 
-    ws.on('close', () => {
-        console.log(`Websocket connection closed from ${req.ip}.`)
+    ws.on('close', (num) => {
+        console.log(`Websocket connection ${num} closed.`)
     })
 })
 
