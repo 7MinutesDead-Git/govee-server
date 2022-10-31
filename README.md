@@ -2,6 +2,8 @@
 A React+Node app originally to let my partner control my wifi LED lights from across the globe. Now I also like to use it for interviews :P  
   
 On the client side, adjust the sliders and color pickers to change the brightness and color of the lightbulbs via REST API.  
+You can save currently selected favorite colors as preset color swatches in the "Presets" accordion menu for each connected light. These presets are saved in localStorage.  
+![image](https://user-images.githubusercontent.com/50963144/199040799-d7a1cc2d-090a-4e19-b40c-12a00b6c9f29.png)
   
 Requests from the frontend React app are sent to this Node server, before being forwarded onto [Govee's external API](https://govee-public.s3.amazonaws.com/developer-docs/GoveeDeveloperAPIReference.pdf) (since these particular light bulbs do not have local API support).  
   
@@ -9,7 +11,6 @@ React-query is used to manage cache and refetch stale data automatically. Howeve
   
 But wouldn't it be cool if not only we could get the current state more often, but even see external changes live? Of course it would! So, this app also makes use of websockets.  
 Any interaction with the UI by you or others will update live for all clients. The server simply broadcasts all changes received to all clients. This is a separate route from the commands send to the external Govee API for actually changing the lights.
-![image](https://user-images.githubusercontent.com/50963144/196177225-3694d2b5-4b7e-4d21-ba8d-2d39891718cf.png)  
   
 The client also [interpolates](https://en.wikipedia.org/wiki/Linear_interpolation) between websocket messages received from the server, so things look smoother. Meaning, if your client receives color updates (someone else is moving the color picker around) every 100ms, the UI will still update every say 16.7ms (60 FPS) and choose a value at a point between the received update and the currently *lerped* (linearly interpolated) value, thus inching closer each render in a smooth fashion. This allows us to reasonably cutdown on the amount of network activity and server load while keeping the live aspect of the UI responsive and smooth.  
   
