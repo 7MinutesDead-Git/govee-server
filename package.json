@@ -20,17 +20,36 @@
   },
   "homepage": "https://github.com/7MinutesDead-Git/govee-server#readme",
   "dependencies": {
-    "@types/express-ws": "^3.0.1",
     "axios": "^0.27.2",
+    "bcryptjs": "^2.4.3",
+    "chai": "^4.3.7",
+    "cookie-parser": "^1.4.6",
+    "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
+    "csurf": "^1.11.0",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
+    "express-rate-limit": "^6.7.0",
+    "express-session": "^1.17.3",
     "express-ws": "^5.0.2",
-    "nodemon": "^2.0.20"
+    "helmet": "^6.0.0",
+    "hpp": "^0.2.3",
+    "mocha": "^10.1.0",
+    "mongoose": "^6.7.2",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.20",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^7.1.2",
+    "should": "^13.2.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.14",
-    "@types/node": "^18.7.23"
+    "@types/express-ws": "^3.0.1",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^18.7.23",
+    "@types/passport": "^1.0.11"
   }
 }
