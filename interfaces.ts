@@ -32,7 +32,7 @@ export interface goveeDevicesResponse {
     data: {
         devices: goveeDevice[]
     },
-    rateLimitReset?: string
+    rateLimitReset?: number
 }
 
 export interface goveeDevice {
@@ -61,4 +61,17 @@ export interface goveeDeviceState {
         { brightness: number },
         { color: { r: number, g: number, b: number } }
     ]
+}
+
+export interface UserInterface {
+    username: string;
+    isAdmin: boolean;
+    id: string;
+}
+
+export interface DatabaseUserInterface {
+    username: string;
+    password: string;
+    isAdmin: boolean;
+    _id: string;
 }
