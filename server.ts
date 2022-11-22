@@ -25,6 +25,7 @@ const app = websocket.app
 const wss = websocket.getWss()
 dotenv.config()
 const LocalStrategy = passportLocal.Strategy
+const url = process.env.LOCAL_URL || process.env.PROD_URL
 
 // ----------------------------------------------------------------
 // Database
@@ -39,9 +40,12 @@ mongoose.connect(process.env.MONGO_URI, (err) => {
 // ----------------------------------------------------------------
 // Middleware
 app.use(cors({
-    origin: [process.env.LOCAL_URL, process.env.PROD_URL],
-    credentials: true
+    origin: url,
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "Origin", "Credentials"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
 }))
+
 app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
