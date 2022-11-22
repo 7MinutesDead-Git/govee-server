@@ -1,7 +1,22 @@
 import * as dotenv from 'dotenv'
+import cors from 'cors'
 import express from 'express'
 import expressWs from 'express-ws'
+import mongoose from "mongoose"
+
+import passport from 'passport'
+import passportLocal from 'passport-local'
+import bcrypt from 'bcryptjs'
+import session from 'express-session'
+import cookieParser from 'cookie-parser'
+import helmet from "helmet"
+import hpp from "hpp"
+import * as jwt from "passport-jwt"
+
+import User from './models/User.js'
+import { DatabaseUserInterface, UserInterface } from './interfaces'
 import { devicesRoutes } from './routes/devices.js'
+import { authRoutes } from "./routes/auth.js"
 
 // ----------------------------------------------------------------
 // Initialization
@@ -9,47 +24,127 @@ const websocket = expressWs(express())
 const app = websocket.app
 const wss = websocket.getWss()
 dotenv.config()
+const LocalStrategy = passportLocal.Strategy
+const url = process.env.LOCAL_URL || process.env.PROD_URL
 
+// ----------------------------------------------------------------
+// Database
+mongoose.connect(process.env.MONGO_URI, (err) => {
+    if (err) {
+        console.error(err)
+        return
+    }
+    console.log("Connected to database.")
+})
 
 // ----------------------------------------------------------------
 // Middleware
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*')
-    res.header('Access-Control-Allow-Headers', '*')
-    res.header('Access-Control-Allow-Methods', 'GET, PUT')
-    next()
-})
+app.use(cors({
+    origin: url,
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "Origin", "Credentials"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+}))
+
 app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+// Security configuration
+app.use(helmet())
+app.use(hpp())
+// Cookie configuration
+app.use(cookieParser())
+app.use(session({
+    // Name of the cookie
+    name: 'govee-session',
+    // String that signs and verifies cookie values
+    secret: process.env.SESSION_SECRET,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 },  // 1 day
+    resave: false,
+    saveUninitialized: true
+}))
+
+// https://plainenglish.io/blog/how-to-send-cookies-from-express-to-a-front-end-application-in-production-9273a4f3ce72
+app.set('trust proxy', 1)
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+// ----------------------------------------------------------------
+// Passport
+passport.use(new LocalStrategy((username: string, password: string, done) => {
+    User.findOne({ username: username }, (err, user: DatabaseUserInterface) => {
+        if (err) throw err
+        if (!user) return done(null, false)
+
+        bcrypt.compare(password, user.password, (err, result: boolean) => {
+            if (err) throw err
+            if (result === true) {
+                return done(null, user)
+            } else {
+                return done(null, false)
+            }
+        })
+    })
+}))
+
+const jwtOptions = {
+    jwtFromRequest:jwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.JWT_KEY,
+    issuer: process.env.JWT_ISSUER,
+    audience: process.env.JWT_AUDIENCE
+}
+
+passport.use(new jwt.Strategy(jwtOptions, (jwt_payload, done) => {
+    User.findOne({id: jwt_payload.sub}, function(err, user) {
+        if (err) {
+            return done(err, false)
+        }
+        if (user) {
+            return done(null, user)
+        } else {
+            return done(null, false)
+        }
+    })
+}))
+
+passport.serializeUser((user: DatabaseUserInterface, cb) => {
+    cb(null, user._id)
+})
+
+passport.deserializeUser((id: string, cb) => {
+    User.findOne({ _id: id }, (err, user: DatabaseUserInterface) => {
+        const userInformation: UserInterface = {
+            username: user.username,
+            isAdmin: user.isAdmin,
+            id: user._id
+        }
+        cb(err, userInformation)
+    })
+})
 
 
 // ----------------------------------------------------------------
 // REST Routes
 app.use("/devices", devicesRoutes)
+app.use("/auth", authRoutes)
 
 // ----------------------------------------------------------------
 // Websocket
 app.ws('/', (ws, req) => {
-    console.log("--------------------")
     console.log("Websocket connections: ", wss.clients.size)
     ws.on('open', () => {
         console.log('Websocket opened.')
-        setInterval(() => {
-            ws.send('keepalive ping')
-        }, 10000)
     })
 
     ws.on('message', (msg: string) => {
         if (msg === "ping") {
+            ws.send("pong")
             return
         }
-        // const data = JSON.parse(msg)
-        // console.log(`${new Date().toLocaleString()}: Message received from client ${req.ip}: ${data.type}`)
-        const broadcastData = msg
         // Send updates to all other clients.
         for (const client of wss.clients) {
-            client.send(broadcastData)
+            client.send(msg)
         }
     })
 
@@ -60,6 +155,7 @@ app.ws('/', (ws, req) => {
 
 
 // ----------------------------------------------------------------
+// Start
 app.listen(process.env.GOVEE_PORT, () => {
-    console.log('Govee server listening on port ', process.env.GOVEE_PORT)
+    console.log('Govee server listening on port', process.env.GOVEE_PORT)
 })
