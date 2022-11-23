@@ -14,25 +14,20 @@ export const authController = {
     },
 
     async logout(req, res) {
-        if (req.isAuthenticated()) {
-            req.logout((err) => {
+        req.logout((err) => {
+            if (err) {
+                console.log(err)
+                return res.status(500).send({ message: err })
+            }
+            console.log("Logging out user:", req.user)
+            req.session.destroy((err) => {
                 if (err) {
                     console.log(err)
                     return res.status(500).send({ message: err })
                 }
-                console.log("Logging out user:", req.user)
-                req.session.destroy((err) => {
-                    if (err) {
-                        console.log(err)
-                        return res.status(500).send({ message: err })
-                    }
-                    return res.status(200).send({ message: "Logged out." })
-                })
+                return res.status(200).send({ message: "Logged out." })
             })
-        }
-        else {
-            return res.status(401).send({ message: "You're not logged in" })
-        }
+        })
     }
 }
 
