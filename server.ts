@@ -138,6 +138,9 @@ app.ws('/', (ws, req) => {
     })
 
     ws.on('message', (msg: string) => {
+        if (msg === "pong") {
+            return
+        }
         if (msg === "ping") {
             ws.send("pong")
             return
@@ -151,6 +154,10 @@ app.ws('/', (ws, req) => {
     ws.on('close', (num) => {
         console.log(`Websocket connection ${num} closed.`)
     })
+    // To keep idle connections alive so that host proxies don't close them.
+    setInterval(() => {
+        ws.send("ping")
+    }, 9000)
 })
 
 
