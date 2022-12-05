@@ -21,8 +21,15 @@ export const devicesController = {
         }
         catch (error) {
             console.error(error.response.data)
-            const rateLimitSeconds = Number(error.response.data.match(/\d+/g)[0])
-            rateLimit.seconds = rateLimitSeconds ? rateLimitSeconds : 0
+            try {
+                const rateLimitSeconds = Number(error.response.data.match(/\d+/g)[0])
+                rateLimit.seconds = rateLimitSeconds ? rateLimitSeconds : 0
+            }
+            catch (e) {
+                console.error("Error parsing rate limit seconds: ", e)
+                res.status(400).send({ message: e })
+                return
+            }
             res.status(429).send(error.response.data)
         }
     },
