@@ -74,7 +74,7 @@ app.use(passport.session())
 // Rate limiting clients.
 const refreshRateLimiter = rateLimit({
     windowMs: 10 * 1000,    // 10 seconds
-    max: 10,                // Limit each IP to x requests per `window`
+    max: 20,                // Limit each IP to x requests per `window`
     standardHeaders: true,  // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false,   // Disable the `X-RateLimit-*` headers
 })
