@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/7MinutesDead-Git/govee-server#readme",
   "dependencies": {
+    "@types/morgan": "^1.9.3",
     "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
     "chai": "^4.3.7",

@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit'
 
 import passport from 'passport'
 import passportLocal from 'passport-local'
+import morgan from 'morgan'
 import bcrypt from 'bcryptjs'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
@@ -133,6 +134,12 @@ passport.deserializeUser((id: string, cb) => {
     })
 })
 
+// ----------------------------------------------------------------
+// Logging
+app.enable("trust proxy")
+const logger = morgan(':method :url :status :res[content-length] - :response-time ms')
+app.use(logger)
+
 
 // ----------------------------------------------------------------
 // REST Routes
@@ -143,9 +150,6 @@ app.use("/auth", authRoutes)
 // Websocket
 app.ws('/', (ws, req) => {
     console.log("Websocket connections: ", wss.clients.size)
-    ws.on('open', () => {
-        console.log('Websocket opened.')
-    })
 
     ws.on('message', (msg: string) => {
         if (msg === "pong") {
@@ -167,7 +171,7 @@ app.ws('/', (ws, req) => {
     // To keep idle connections alive so that host proxies don't close them.
     setInterval(() => {
         ws.send("ping")
-    }, 9000)
+    }, 9001)
 })
 
 
