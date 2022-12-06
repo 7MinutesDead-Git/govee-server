@@ -2,8 +2,7 @@ import {govee, goveeDevice, goveeDeviceState} from "../interfaces.js"
 import {getConnectedLights, sendLightCommand} from "../utils/lights.js"
 import axios from "axios"
 import { Request, Response } from "express"
-
-const rateLimit = { seconds: 0 }
+const goveeRateLimit = { seconds: 0 }
 
 export const devicesController = {
     async sendCommand(req, res) {
@@ -23,7 +22,7 @@ export const devicesController = {
             console.error(error.response.data)
             try {
                 const rateLimitSeconds = Number(error.response.data.match(/\d+/g)[0])
-                rateLimit.seconds = rateLimitSeconds ? rateLimitSeconds : 0
+                goveeRateLimit.seconds = rateLimitSeconds ? rateLimitSeconds : 0
             }
             catch (e) {
                 console.error("Error parsing rate limit seconds: ", e)
@@ -40,8 +39,8 @@ export const devicesController = {
             const response = await getConnectedLights(url)
             if (response.code === 429) {
                 res.status(response.code)
-                console.log("Retry at: ", rateLimit.seconds)
-                response.rateLimitReset = rateLimit.seconds
+                console.log("Retry at: ", goveeRateLimit.seconds)
+                response.rateLimitReset = goveeRateLimit.seconds
                 res.send(response)
             }
             else {
@@ -78,9 +77,9 @@ export const devicesController = {
         }
     },
     getRateLimit(req: Request, res: Response) {
-        console.log("🐟 Rate limit request received 🐟", rateLimit.seconds)
-        res.header("Retry-After", JSON.stringify(rateLimit.seconds))
-        res.send(rateLimit)
+        console.log("🐟 Rate limit request received 🐟", goveeRateLimit.seconds)
+        res.header("Retry-After", JSON.stringify(goveeRateLimit.seconds))
+        res.send(goveeRateLimit)
     }
 }
 

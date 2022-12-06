@@ -2,21 +2,22 @@ import * as dotenv from 'dotenv'
 import cors from 'cors'
 import express from 'express'
 import expressWs from 'express-ws'
-import mongoose from "mongoose"
+import mongoose from 'mongoose'
+import rateLimit from 'express-rate-limit'
 
 import passport from 'passport'
 import passportLocal from 'passport-local'
 import bcrypt from 'bcryptjs'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
-import helmet from "helmet"
-import hpp from "hpp"
-import * as jwt from "passport-jwt"
+import helmet from 'helmet'
+import hpp from 'hpp'
+import * as jwt from 'passport-jwt'
 
 import User from './models/User.js'
 import { DatabaseUserInterface, UserInterface } from './interfaces'
 import { devicesRoutes } from './routes/devices.js'
-import { authRoutes } from "./routes/auth.js"
+import { authRoutes } from './routes/auth.js'
 
 // ----------------------------------------------------------------
 // Initialization
@@ -69,6 +70,15 @@ app.set('trust proxy', 1)
 
 app.use(passport.initialize())
 app.use(passport.session())
+
+// Rate limiting clients.
+const refreshRateLimiter = rateLimit({
+    windowMs: 10 * 1000,    // 10 seconds
+    max: 10,                // Limit each IP to x requests per `window`
+    standardHeaders: true,  // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false,   // Disable the `X-RateLimit-*` headers
+})
+app.use('/', refreshRateLimiter)
 
 // ----------------------------------------------------------------
 // Passport
