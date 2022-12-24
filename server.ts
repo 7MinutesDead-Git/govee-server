@@ -149,6 +149,13 @@ app.use("/auth", authRoutes)
 // ----------------------------------------------------------------
 // Websocket
 app.ws('/', (ws, req) => {
+    // Prevent cross-origin attacks by first verifying the origin of the request.
+    // There's nothing sensitive in the ws, but preventing malicious spam would be nice.
+    if (req.headers.origin !== url) {
+        console.log("Invalid websocket origin from: ", req.headers.origin)
+        ws.terminate()
+        return
+    }
     console.log("Websocket connections: ", wss.clients.size)
 
     ws.on('message', (msg: string) => {
