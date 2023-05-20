@@ -99,26 +99,6 @@ passport.use(new LocalStrategy((username: string, password: string, done) => {
     })
 }))
 
-const jwtOptions = {
-    jwtFromRequest:jwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_KEY,
-    issuer: process.env.JWT_ISSUER,
-    audience: process.env.JWT_AUDIENCE
-}
-
-passport.use(new jwt.Strategy(jwtOptions, (jwt_payload, done) => {
-    User.findOne({id: jwt_payload.sub}, function(err, user) {
-        if (err) {
-            return done(err, false)
-        }
-        if (user) {
-            return done(null, user)
-        } else {
-            return done(null, false)
-        }
-    })
-}))
-
 passport.serializeUser((user: DatabaseUserInterface, cb) => {
     cb(null, user._id)
 })
