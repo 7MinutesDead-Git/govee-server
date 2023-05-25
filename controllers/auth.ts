@@ -1,4 +1,5 @@
 export const authController = {
+    // Logs in the user, creating a session and sending cookie.
     async login(req, res) {
         req.login(req.user, (err) => {
             if (err) {
@@ -12,7 +13,7 @@ export const authController = {
             return res.status(200).send({ message: "Logged in." })
         })
     },
-
+    // Destroys the session (logs out the user), invalidating the cookie.
     async logout(req, res) {
         req.logout((err) => {
             if (err) {
