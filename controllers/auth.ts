@@ -29,6 +29,14 @@ export const authController = {
                 return res.status(200).send({ message: "Logged out." })
             })
         })
+    },
+    // Checks if the user already has a valid session.
+    async getSession(req, res) {
+        if (req.user) {
+            res.send(req.user)
+        } else {
+            res.status(401).send({ message: 'Not logged in' })
+        }
     }
 }
 

@@ -6,5 +6,6 @@ const router = express.Router()
 
 router.post('/', passport.authenticate("local"), authController.login)
 router.delete('/', authController.logout)
+router.get('/session', authController.getSession)
 
 export { router as authRoutes }
