@@ -13,7 +13,6 @@ import session from 'express-session'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import hpp from 'hpp'
-import * as jwt from 'passport-jwt'
 
 import User from './models/User.js'
 import { DatabaseUserInterface, UserInterface } from './interfaces'
