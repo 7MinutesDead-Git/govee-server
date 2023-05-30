@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit'
 
 import passport from 'passport'
 import passportLocal from 'passport-local'
+import MongoStore from 'connect-mongo'
 import morgan from 'morgan'
 import bcrypt from 'bcryptjs'
 import session from 'express-session'
