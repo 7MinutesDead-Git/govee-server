@@ -61,7 +61,13 @@ app.use(session({
     name: 'govee-session',
     // String that signs and verifies cookie values
     secret: process.env.SESSION_SECRET,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 },  // 1 day
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 72, // 3 days
+        // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        // secure: process.env.NODE_ENV === 'production', // Set secure flag only in production
+        sameSite: 'None',
+        secure: true,
+    },
     resave: false,
     saveUninitialized: true
 }))
