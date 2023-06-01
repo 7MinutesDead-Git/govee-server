@@ -69,7 +69,12 @@ app.use(session({
         secure: true,
     },
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    rolling: true,
+    store: MongoStore.create({ // Use MongoStore for session storage
+        mongoUrl: process.env.MONGO_URI,
+        collectionName: 'sessions',
+    }),
 }))
 
 // https://plainenglish.io/blog/how-to-send-cookies-from-express-to-a-front-end-application-in-production-9273a4f3ce72
