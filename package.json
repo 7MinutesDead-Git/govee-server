@@ -24,6 +24,7 @@
     "axios": "^0.27.2",
     "bcryptjs": "^2.4.3",
     "chai": "^4.3.7",
+    "connect-mongo": "^5.0.0",
     "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
     "cors": "^2.8.5",

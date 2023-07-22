@@ -3,3 +3,4 @@ fly.toml
 package-lock.json
 bfg.jar
 .env
+/_private/

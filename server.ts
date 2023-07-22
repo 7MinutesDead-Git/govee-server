@@ -7,13 +7,13 @@ import rateLimit from 'express-rate-limit'
 
 import passport from 'passport'
 import passportLocal from 'passport-local'
+import MongoStore from 'connect-mongo'
 import morgan from 'morgan'
 import bcrypt from 'bcryptjs'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
 import helmet from 'helmet'
 import hpp from 'hpp'
-import * as jwt from 'passport-jwt'
 
 import User from './models/User.js'
 import { DatabaseUserInterface, UserInterface } from './interfaces'
@@ -61,9 +61,20 @@ app.use(session({
     name: 'govee-session',
     // String that signs and verifies cookie values
     secret: process.env.SESSION_SECRET,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 },  // 1 day
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 72, // 3 days
+        // sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        // secure: process.env.NODE_ENV === 'production', // Set secure flag only in production
+        sameSite: 'None',
+        secure: true,
+    },
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
+    rolling: true,
+    store: MongoStore.create({ // Use MongoStore for session storage
+        mongoUrl: process.env.MONGO_URI,
+        collectionName: 'sessions',
+    }),
 }))
 
 // https://plainenglish.io/blog/how-to-send-cookies-from-express-to-a-front-end-application-in-production-9273a4f3ce72
