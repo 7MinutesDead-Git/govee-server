@@ -68,8 +68,10 @@ app.use(session({
         sameSite: 'None',
         secure: true,
     },
+    // Avoids creating a new session unless something has changed.
     resave: false,
-    saveUninitialized: true,
+    // No session is stored in the DB unless it carries information.
+    saveUninitialized: false,
     rolling: true,
     store: MongoStore.create({ // Use MongoStore for session storage
         mongoUrl: process.env.MONGO_URI,
